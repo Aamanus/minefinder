@@ -1,6 +1,7 @@
 
 import tkinter as tk
 from src.settings import gSettings
+import time
 
 class gDraw:
     def __init__(self, screen_width=gSettings.SCREEN_WIDTH, screen_height=gSettings.SCREEN_HEIGHT):
@@ -11,6 +12,10 @@ class gDraw:
         self.root = tk.Tk()
         self.root.title(gSettings.GAME_TITLE)
         
+        self.start_time = None
+        self.end_time = None
+        self.time_taken = None
+
         # Calculate window position for center of screen
         pos_x = (self.root.winfo_screenwidth() // 2) - (screen_width // 2)
         pos_y = (self.root.winfo_screenheight() // 2) - (screen_height // 2)
@@ -125,6 +130,36 @@ class gDraw:
             bg=gSettings.BACKGROUND_COLOR
         )
         self.game_over_message.pack(pady=5)
+
+    def start_timer(self):
+        """Start the timer"""
+        print("timer started")
+        self.start_time = time.time()
+        self.update_timer()  # Start the timer updates
+
+    def update_timer(self):
+        """Update the timer display"""
+        if self.start_time is not None and self.end_time is None:  # Only update if timer is running
+            current_time = time.time() - self.start_time
+            self.time_elapsed.config(text=f"Time Elapsed: {current_time:.1f}")
+            # Schedule the next update in 100ms (10 updates per second)
+            self.root.after(100, self.update_timer)
+
+    def stop_timer(self):
+        """Stop the timer"""
+        print("timer stopped")
+        self.end_time = time.time()
+        self.time_taken = self.end_time - self.start_time
+        self.time_elapsed.config(text=f"Time Elapsed: {self.time_taken:.1f}")
+
+    def reset_timer(self):
+        """Reset the timer"""
+        self.start_time = None
+        self.end_time = None
+        self.time_taken = None
+        self.time_elapsed.config(text="Time Elapsed: 0.0")
+
+
     def new_minefield(self):
         """Generate a new minefield"""
         # Get the difficulty
@@ -139,6 +174,9 @@ class gDraw:
         # Call the callback function
         # clear the canvas
         self.clear_canvas()
+        # reset timer
+        self.reset_timer()
+        
         self.new_minefield_callback(gSettings.MINEFIELD_WIDTH,
                                     gSettings.MINEFIELD_HEIGHT,
                                     num_mines)
@@ -155,9 +193,10 @@ class gDraw:
         """Display game over message"""
         # write the gameover message to the lable in self._game_over_message
         self.game_over_message.config(text=message)
+        # stop the timer
+        self.stop_timer()
         #  redraw the label
         self.game_over_message.update()
-
 
     def clear_canvas(self):
         """Clear all items from the canvas"""

@@ -1,6 +1,6 @@
 from src.gdraw import gDraw
 from src.minefield import MineField
-from src.settings import gSettings
+from src.settings import gSettings, gDifficulties
 
 def main():
     """Main function to run the game"""
@@ -13,7 +13,7 @@ def main():
     minefield = MineField(
         gSettings.MINEFIELD_WIDTH,
         gSettings.MINEFIELD_HEIGHT,
-        gSettings.NUMBER_MINES,
+        gDifficulties.EASY,
         gdraw
     )
     print("Minefield created")

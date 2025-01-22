@@ -1,6 +1,6 @@
 
 import tkinter as tk
-from src.settings import gSettings
+from src.settings import gSettings, gDifficulties
 import time
 
 class gDraw:
@@ -105,6 +105,13 @@ class gDraw:
             bg=gSettings.BACKGROUND_COLOR
         )
         self.status.pack(pady=5)
+        # create a label for the total number of mines
+        self.total_mines = tk.Label(
+            self.options_frame,
+            text="Total Mines: 0",
+            font=("Arial", 16),
+            bg=gSettings.BACKGROUND_COLOR
+        )
         # Create a label for the mines remaining
         self.mines_remaining = tk.Label(
             self.options_frame,
@@ -159,27 +166,34 @@ class gDraw:
         self.time_taken = None
         self.time_elapsed.config(text="Time Elapsed: 0.0")
 
-
+    def update_total_mines(self, num_mines):
+        """Update the total number of mines"""
+        self.total_mines.config(text=f"Total Mines: {num_mines}")
+        self.update_mines_remaining(num_mines)
+    
+    def update_mines_remaining(self, num_mines):
+        """Update the number of mines remaining"""
+        self.mines_remaining.config(text=f"Mines Remaining: {num_mines}")
     def new_minefield(self):
         """Generate a new minefield"""
         # Get the difficulty
         difficulty = self.difficulty.get()
         # Get the number of mines
         if difficulty == "Easy":
-            num_mines = gSettings.NUM_MINES_EASY
+            difficulty = gDifficulties.EASY
         elif difficulty == "Medium":
-            num_mines = gSettings.NUM_MNIES_MEDIUM
+            difficulty = gDifficulties.MEDIUM
         else:
-            num_mines = gSettings.NUM_MINES_HARD
+            difficulty = gDifficulties.HARD
         # Call the callback function
         # clear the canvas
         self.clear_canvas()
         # reset timer
         self.reset_timer()
-        
+
         self.new_minefield_callback(gSettings.MINEFIELD_WIDTH,
                                     gSettings.MINEFIELD_HEIGHT,
-                                    num_mines)
+                                    difficulty)
         # Update the status
         self.status.config(text="Ready")
         # Update the mines remaining

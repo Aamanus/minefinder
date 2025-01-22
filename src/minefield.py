@@ -2,7 +2,7 @@ import tkinter
 import random
 import sys
 import math
-import time
+
 from src.settings import gSettings
 from src.gdraw import gDraw
 
@@ -21,11 +21,14 @@ class MineTile:
 
 
 class MineField:
-    def __init__(self, width, height, num_mines,game: gDraw):
+    def __init__(self, width, height, difficulty,game: gDraw):
         self.width = width
         self.height = height
         self.field=[]
-        self.num_mines = num_mines
+
+        self.num_mines = int(width * height * gSettings.DIFFICULTY_MINE_MULTIPLIER[difficulty])
+        game.update_mines_remaining(self.num_mines)
+        self.difficulty = difficulty
         self.mines = set()
         self.flags = set()
         self.revealed = set()
@@ -38,7 +41,7 @@ class MineField:
         self.num_incorrect_flags = 0
         self.num_mines_revealed = 0
         self.num_non_mines_revealed = 0
-        self.num_non_mines = width * height - num_mines
+        self.num_non_mines = width * height - self.num_mines
         self.generate_minefield()
         self.generate_mines()
         self.calculate_adjacent_mines()
@@ -52,14 +55,14 @@ class MineField:
 
 
     # Callback functions
-    def new_minefield(self,width,height,num_mines):
+    def new_minefield(self,width,height,difficulty):
         self.game.clear_canvas()
         self.game.update()
-        self.__init__(width, height, num_mines, self.game)
+        self.__init__(width, height, difficulty, self.game)
 
     def handle_click(self, event):
-        if self.start_time is None:
-            self.start_time = time.time()
+        if self.game.start_time is None:
+            self.game.start_timer()
         if self.game_over:
             return
         # Get the tile that was clicked
@@ -71,9 +74,14 @@ class MineField:
             self.field[x][y].is_flagged = not self.field[x][y].is_flagged
             if self.field[x][y].is_flagged:
                 self.flags.add((x,y))
-
+                if (x, y) in self.mines:
+                    self.num_correct_flags += 1
             else:
                 self.flags.remove((x,y))
+                if (x, y) in self.mines:
+                    self.num_correct_flags -= 1
+            
+            self.game.update_mines_remaining(self.num_mines - len(self.flags))
 
             self.game.clear_canvas()
             self.draw_minefield()
@@ -86,13 +94,13 @@ class MineField:
             if self.field[x][y].is_mine:
                 # Game over
                 self.game_over = True
-                self.end_time = time.time()
-                self.time_taken = self.end_time - self.start_time
+                
                 # reveal all mines
                 for mine in self.mines:
                     self.reveal_tile(mine[0], mine[1])
-                self.game.update()
+                
                 self.game.game_over(f"You found a mine at {x},{y}")
+                self.game.update()
 
             else:
                 # Reveal the tile

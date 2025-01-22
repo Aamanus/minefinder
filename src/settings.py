@@ -1,3 +1,8 @@
+class gDifficulties:
+    EASY = 0
+    MEDIUM = 1
+    HARD = 2
+
 class gSettings:
 
     GAME_TITLE = "Minefinder"
@@ -9,8 +14,8 @@ class gSettings:
     TILE_EMPTY_COLOR = "#e0e0e0"
     TILE_MINE_COLOR = "#ff0000"
     TILE_FLAG_COLOR = "#ffff00"
-    SCREEN_HEIGHT = 600
-    SCREEN_WIDTH = 900
+    SCREEN_HEIGHT = 800
+    SCREEN_WIDTH = 1100
     MINEFIELD_PAD_X = 50
     MINEFIELD_PAD_Y = 50
     # Add other game settings as needed
@@ -19,9 +24,14 @@ class gSettings:
     MINEFIELD_WIDTH = 25
     MINEFIELD_HEIGHT = 25
     NUMBER_MINES = (MINEFIELD_HEIGHT*MINEFIELD_WIDTH)//5
-    NUM_MINES_EASY = (MINEFIELD_HEIGHT*MINEFIELD_WIDTH)//5
-    NUM_MNIES_MEDIUM = (MINEFIELD_HEIGHT*MINEFIELD_WIDTH)//4
-    NUM_MINES_HARD = (MINEFIELD_HEIGHT*MINEFIELD_WIDTH)//3
+    NUM_MINES_EASY = 0.2
+    NUM_MNIES_MEDIUM = 0.3
+    NUM_MINES_HARD = 0.5
+    DIFFICULTY_MINE_MULTIPLIER = {
+        gDifficulties.EASY: NUM_MINES_EASY,
+        gDifficulties.MEDIUM: NUM_MNIES_MEDIUM,
+        gDifficulties.HARD: NUM_MINES_HARD
+    }
     NUMBER_COLORS = {
         1: "#0000ff",
         2: "#008000",
@@ -32,3 +42,4 @@ class gSettings:
         7: "#000000",
         8: "#808080",
     }
+

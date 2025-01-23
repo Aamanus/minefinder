@@ -2,6 +2,12 @@ class gDifficulties:
     EASY = 0
     MEDIUM = 1
     HARD = 2
+    VEASY = 3
+
+class gMinefieldSizes:
+    SMALL = 0
+    MEDIUM = 1
+    LARGE = 2
 
 class gSettings:
 
@@ -16,11 +22,11 @@ class gSettings:
     TILE_FLAG_COLOR = "#ffff00"
     SCREEN_HEIGHT = 800
     SCREEN_WIDTH = 1100
+    SCREEN_MENUS_WIDTH = 300
     MINEFIELD_PAD_X = 50
     MINEFIELD_PAD_Y = 50
     # Add other game settings as needed
 
-    TILE_SIZE = 20
     MINEFIELD_WIDTH = 25
     MINEFIELD_HEIGHT = 25
     NUMBER_MINES = (MINEFIELD_HEIGHT*MINEFIELD_WIDTH)//5
@@ -30,7 +36,13 @@ class gSettings:
     DIFFICULTY_MINE_MULTIPLIER = {
         gDifficulties.EASY: NUM_MINES_EASY,
         gDifficulties.MEDIUM: NUM_MNIES_MEDIUM,
-        gDifficulties.HARD: NUM_MINES_HARD
+        gDifficulties.HARD: NUM_MINES_HARD,
+        gDifficulties.VEASY: 0.1
+    }
+    MINEFIELD_SIZES = {
+        gMinefieldSizes.SMALL: (10, 10),
+        gMinefieldSizes.MEDIUM: (25, 25),
+        gMinefieldSizes.LARGE: (50, 50)
     }
     NUMBER_COLORS = {
         1: "#0000ff",

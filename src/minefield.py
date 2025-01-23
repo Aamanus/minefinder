@@ -25,6 +25,12 @@ class MineField:
         self.width = width
         self.height = height
         self.field=[]
+        # calculate self.tile_size based on the available canvas, accounting for the menus in the width, and padding in both 
+        self.tile_size = min(
+            (gSettings.SCREEN_WIDTH - gSettings.SCREEN_MENUS_WIDTH - 2 * gSettings.MINEFIELD_PAD_X) / width,
+            (gSettings.SCREEN_HEIGHT - gSettings.STATUS_BAR_HEIGHT - 2 * gSettings.MINEFIELD_PAD_Y) / height
+        )
+        
 
         self.num_mines = int(width * height * gSettings.DIFFICULTY_MINE_MULTIPLIER[difficulty])
         game.update_mines_remaining(self.num_mines)
@@ -51,6 +57,7 @@ class MineField:
         self.game.clear_canvas()
         self.draw_minefield()
         self.game.bind_click(self.handle_click, "tile")
+        self.game.update_mines_remaining(self.num_mines)
         self.game.new_minefield_callback = self.new_minefield
 
 
@@ -66,8 +73,8 @@ class MineField:
         if self.game_over:
             return
         # Get the tile that was clicked
-        x = math.floor((event.x - gSettings.MINEFIELD_PAD_X) / gSettings.TILE_SIZE)
-        y = math.floor((event.y - gSettings.MINEFIELD_PAD_Y) / gSettings.TILE_SIZE)
+        x = math.floor((event.x - gSettings.MINEFIELD_PAD_X) / self.tile_size)
+        y = math.floor((event.y - gSettings.MINEFIELD_PAD_Y) / self.tile_size)
 
         # Right click to toggle flag
         if event.num == 3:
@@ -101,10 +108,17 @@ class MineField:
                 
                 self.game.game_over(f"You found a mine at {x},{y}")
                 self.game.update()
-
+            elif self.field[x][y].is_flagged:
+                # Do nothing
+                return
+            elif self.field[x][y].is_revealed:
+                # Do nothing
+                return
             else:
                 # Reveal the tile
                 self.reveal_tile(x, y)
+                if self.num_revealed == self.num_non_mines:
+                    self.game.game_win("You win!")
                 self.game.clear_canvas()
                 self.draw_minefield()
                 self.game.update()      
@@ -146,7 +160,7 @@ class MineField:
         for i in range(self.width):
             row = []
             for j in range(self.height):
-                row.append(MineTile(i, j, gSettings.TILE_SIZE, gSettings.TILE_NORMAL_COLOR))
+                row.append(MineTile(i, j, self.tile_size, gSettings.TILE_NORMAL_COLOR))
             self.field.append(row)
 
     def generate_mines(self):

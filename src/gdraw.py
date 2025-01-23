@@ -1,6 +1,6 @@
 
 import tkinter as tk
-from src.settings import gSettings, gDifficulties
+from src.settings import gSettings, gDifficulties, gMinefieldSizes
 import time
 
 class gDraw:
@@ -66,6 +66,24 @@ class gDraw:
             font=("Arial", 24),
             bg=gSettings.BACKGROUND_COLOR
         ).pack(pady=10)
+        # Create a label for minefield size (small, medium, large)
+        tk.Label(
+            self.options_frame,
+            text="Minefield Size",
+            font=("Arial", 16),
+            bg=gSettings.BACKGROUND_COLOR
+        ).pack(pady=5)
+        # Create a dropdown for the minefield size
+        self.minefield_size = tk.StringVar(self.root)
+        self.minefield_size.set("Small")  # default value
+        tk.OptionMenu(
+            self.options_frame,
+            self.minefield_size,
+            "Small",
+            "Medium",
+            "Large"
+        ).pack(pady=5)
+
         # Create a label for the difficulty
         tk.Label(
             self.options_frame,
@@ -174,6 +192,7 @@ class gDraw:
     def update_mines_remaining(self, num_mines):
         """Update the number of mines remaining"""
         self.mines_remaining.config(text=f"Mines Remaining: {num_mines}")
+
     def new_minefield(self):
         """Generate a new minefield"""
         # Get the difficulty
@@ -185,19 +204,32 @@ class gDraw:
             difficulty = gDifficulties.MEDIUM
         else:
             difficulty = gDifficulties.HARD
+        # get minefield size
+        size = self.minefield_size.get()    
+        if size == "Small":
+            size = gMinefieldSizes.SMALL
+
+        elif size == "Medium":
+            size = gMinefieldSizes.MEDIUM
+        
+        else:
+            size = gMinefieldSizes.LARGE
+
+        size_x, size_y = gSettings.MINEFIELD_SIZES[size]
+
         # Call the callback function
         # clear the canvas
         self.clear_canvas()
         # reset timer
         self.reset_timer()
 
-        self.new_minefield_callback(gSettings.MINEFIELD_WIDTH,
-                                    gSettings.MINEFIELD_HEIGHT,
+        self.new_minefield_callback(size_x,
+                                    size_y,
                                     difficulty)
         # Update the status
         self.status.config(text="Ready")
         # Update the mines remaining
-        self.mines_remaining.config(text=f"Mines Remaining: {num_mines}")
+        # self.mines_remaining.config(text=f"Mines Remaining: ")
         # Update the time elapsed
         self.time_elapsed.config(text="Time Elapsed: 0")
         # Update the game over message
@@ -207,6 +239,20 @@ class gDraw:
         """Display game over message"""
         # write the gameover message to the lable in self._game_over_message
         self.game_over_message.config(text=message)
+        # set game over message to red
+        self.game_over_message.config(fg="red")
+
+        # stop the timer
+        self.stop_timer()
+        #  redraw the label
+        self.game_over_message.update()
+
+    def game_win(self,message):
+        """Display game win message"""
+        # write the gameover message to the lable in self._game_over_message
+        self.game_over_message.config(text=message)
+        # set game over message to green
+        self.game_over_message.config(fg="green")
         # stop the timer
         self.stop_timer()
         #  redraw the label
